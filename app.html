@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>発音記号マスター | IPA Pronunciation Learning</title>
+    <meta name="description" content="美しいApple風デザインで英語のIPA発音記号を学習できるアプリ">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body>
+    <div id="root"></div>
+    
+    <script type="text/babel">
+        const { useState } = React;
+        
+        // アイコンコンポーネント
+        const ChevronLeft = () => (
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <polyline points="15,18 9,12 15,6"></polyline>
+            </svg>
+        );
+        
+        const ChevronRight = () => (
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <polyline points="9,18 15,12 9,6"></polyline>
+            </svg>
+        );
+        
+        const Volume2 = () => (
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <polygon points="11,5 6,9 2,9 2,15 6,15 11,19 11,5"></polygon>
+                <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+            </svg>
+        );
+        
+        const Info = () => (
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="16" x2="12" y2="12"></line>
+                <line x1="12" y1="8" x2="12.01" y2="8"></line>
+            </svg>
+        );
+        
+        const Shuffle = () => (
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <polyline points="16,3 21,3 21,8"></polyline>
+                <line x1="4" y1="20" x2="21" y2="3"></line>
+                <polyline points="21,16 21,21 16,21"></polyline>
+                <line x1="15" y1="15" x2="21" y2="21"></line>
+                <line x1="4" y1="4" x2="9" y2="9"></line>
+            </svg>
+        );
+        
+        const Eye = () => (
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                <circle cx="12" cy="12" r="3"></circle>
+            </svg>
+        );
+        
+        const Play = () => (
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <polygon points="5,3 19,12 5,21 5,3"></polygon>
+            </svg>
+        );
+
+        const PronunciationApp = () => {
+            const [currentSymbolIndex, setCurrentSymbolIndex] = useState(0);
+            const [showDetails, setShowDetails] = useState(false);
+            const [selectedCategory, setSelectedCategory] = useState('vowels');
+            const [detailsMode, setDetailsMode] = useState('manual');
+            const [showMouthDiagram, setShowMouthDiagram] = useState(false);
+
+            const pronunciationData = {
+                vowels: [
+                    {
+                        symbol: "ɪ",
+                        name: "Short I",
+                        description: "短い「イ」の音",
+                        category: "短母音",
+                        examples: ["sit", "hit", "lip", "ship", "fish", "big"],
+                        japaneseGuide: "日本語の「イ」に近い短い母音。口を横に引きすぎないように注意。短くはっきりと発声する。",
+                        bodyInstructions: "口はあまり大きく開かず、リラックスした状態で舌を中央やや上に置く。上あごとの隙間を狭くする。",
+                        difficulty: "easy",
+                        commonMistakes: ["日本語の「イ」と同じにしてしまう", "長く伸ばしてしまう", "口を横に広げすぎる"],
+                        tips: ["口をあまり横に広げすぎない", "舌の位置は中央やや上", "短く切るように発音"],
+                        technicalNotes: "短母音/ɪ/は日本語の「イ」より少し低く、/iː/との区別が重要。舌の高さと緊張度が/iː/より低い。",
+                        confusedWith: "/iː/ (長いイー), /e/ (短いエ)",
+                        minimalPairs: "sheep /ʃiːp/ vs ship /ʃɪp/, feel /fiːl/ vs fill /fɪl/",
+                        phoneticContext: "語中・語尾に多く現れる。閉音節でよく使われる。",
+                        frequency: "英語で最も頻出する母音の一つ"
+                    },
+                    {
+                        symbol: "iː",
+                        name: "Long E",
+                        description: "長い「イー」の音",
+                        category: "長母音",
+                        examples: ["see", "feet", "tree", "cheese", "key", "machine"],
+                        japaneseGuide: "日本語の「イー」を長く伸ばす感じ。口を横に広げて、張りのある音。舌の位置は/ɪ/より高く緊張させる。",
+                        bodyInstructions: "笑顔を作るように口角を上げて、舌の前を天井に近づける。その状態のまま音を長めに伸ばして発音。",
+                        difficulty: "easy",
+                        commonMistakes: ["短くしてしまう", "口を十分に横に広げない", "/ɪ/と区別できない"],
+                        tips: ["笑顔を作るような口の形", "舌の前部を天井に近づける", "しっかり長く伸ばす"],
+                        technicalNotes: "短母音/ɪ/との対比で練習。音の長さだけでなく質も異なる。閉じた前舌高母音。",
+                        confusedWith: "/ɪ/ (短いイ), /eɪ/ (エイ二重母音)",
+                        minimalPairs: "sheep /ʃiːp/ vs ship /ʃɪp/, beat /biːt/ vs bit /bɪt/",
+                        phoneticContext: "開音節や語尾に多く現れる。",
+                        frequency: "英語母音の中で高頻度"
+                    },
+                    {
+                        symbol: "e",
+                        name: "Short E", 
+                        description: "短い「エ」の音",
+                        category: "短母音",
+                        examples: ["pen", "head", "egg", "dress", "ten", "vet"],
+                        japaneseGuide: "日本語の「エ」に近い音。口を自然にやや開き、舌は中央前方に置く。",
+                        bodyInstructions: "口を軽く横に引いた形で、舌先は口の前寄りに置き、舌全体は平らに保つ。",
+                        difficulty: "easy",
+                        commonMistakes: ["日本語の「エ」と完全に同じにしてしまう", "/æ/と混同する"],
+                        tips: ["口を自然に開く", "舌は前方中央", "リラックスした「エ」"],
+                        technicalNotes: "前舌中低母音。日本語の「エ」とほぼ同じだが、英語では少しリラックスした音。",
+                        confusedWith: "/æ/ (短いア), /ɪ/ (短いイ)",
+                        minimalPairs: "pen /pen/ vs pan /pæn/, bet /bet/ vs bat /bæt/",
+                        phoneticContext: "主に閉音節で現れる。",
+                        frequency: "英語で頻出する母音"
+                    },
+                    {
+                        symbol: "æ",
+                        name: "Short A",
+                        description: "広い「ア」の音",
+                        category: "短母音",
+                        examples: ["cat", "hat", "man", "apple", "back", "family"],
+                        japaneseGuide: "日本語の「ア」と「エ」の中間のような音。「エ」の口で「ア」と発声する。",
+                        bodyInstructions: "口を横に大きく開き、舌を前で低く保つ。口腔内のスペースを広めに保つ。",
+                        difficulty: "medium",
+                        commonMistakes: ["日本語の「ア」と同じにしてしまう", "口を縦に開いてしまう", "/ʌ/と混同する"],
+                        tips: ["口を横に大きく開く", "舌を前で低く保つ", "「エ」の口で「ア」と発声"],
+                        technicalNotes: "前舌低母音で、舌は最も低い位置。口の形は「エ」寄りで音は「ア」。",
+                        confusedWith: "/ʌ/ (短いア), /ɑː/ (長いアー), /e/ (短いエ)",
+                        minimalPairs: "cat /kæt/ vs cut /kʌt/, pan /pæn/ vs pen /pen/",
+                        phoneticContext: "主に閉音節で現れる。アメリカ英語の特徴的な音。",
+                        frequency: "英語で非常に頻出する母音"
+                    }
+                ],
+                consonants: [
+                    {
+                        symbol: "θ",
+                        name: "Voiceless TH",
+                        description: "舌を噛む無声音",
+                        category: "摩擦音",
+                        examples: ["think", "three", "mouth", "birthday", "tooth", "nothing"],
+                        japaneseGuide: "日本語にない子音。舌を軽く噛んで「ス」の音。息だけで声は出さない。",
+                        bodyInstructions: "舌先を歯の間に軽く挟み、両側から息を「スー」っと漏らす。舌が少し見えるくらい前に出す。",
+                        difficulty: "hard",
+                        commonMistakes: ["「サ」「ス」で代用してしまう", "舌を深く噛みすぎる", "/s/と混同する"],
+                        tips: ["舌先だけを軽く噛む", "息だけを出して声は出さない", "舌が見えるように"],
+                        technicalNotes: "英語では/θ/と/s/は別の音。/s/は舌先を歯茎に近づけるが挟まれない。",
+                        confusedWith: "/s/ (歯茎摩擦音), /f/ (唇歯摩擦音), /t/ (破裂音)",
+                        minimalPairs: "think /θɪŋk/ vs sink /sɪŋk/, three /θriː/ vs tree /triː/",
+                        phoneticContext: "語頭、語中、語尾すべてに現れる。特に語尾でよく使われる。",
+                        frequency: "英語で中程度の頻度"
+                    },
+                    {
+                        symbol: "r",
+                        name: "American R",
+                        description: "アメリカ英語のR音",
+                        category: "接近音",
+                        examples: ["red", "car", "very", "correct", "three", "great"],
+                        japaneseGuide: "舌を丸めて「ワ行」の口の形。舌先は何にも触れない。舌を奥に引く感じ。",
+                        bodyInstructions: "唇を軽くすぼめて前に突き出し、舌先を口内のどこにも触れない位置で軽く後方に丸める。",
+                        difficulty: "hard",
+                        commonMistakes: ["日本語の「ラ行」で代用", "舌先を上顎に付けてしまう", "巻き舌にしすぎる"],
+                        tips: ["舌先は何にも触れない", "舌全体を丸める", "唇も少し丸める"],
+                        technicalNotes: "日本語の「ラ行」は弾音だが、英語の/r/では舌先は浮いたまま。歯茎接近音。",
+                        confusedWith: "/l/ (側面音), /w/ (両唇接近音)",
+                        minimalPairs: "right /raɪt/ vs light /laɪt/, red /red/ vs led /led/",
+                        phoneticContext: "語頭、語中、語尾すべてに現れる。子音クラスターでも頻出。",
+                        frequency: "英語で非常に高頻度"
+                    }
+                ],
+                diphthongs: [
+                    {
+                        symbol: "eɪ",
+                        name: "Long A",
+                        description: "「エイ」二重母音",
+                        category: "二重母音",
+                        examples: ["eight", "safe", "pay", "take", "make", "day"],
+                        japaneseGuide: "「エ」から「イ」へ滑らかに移動。後半の「イ」は軽く添える。日本語の「エイ」より滑らか。",
+                        bodyInstructions: "「エ」の口から始まって「イ」の口で終わる。口の形をあまり変えすぎずに舌を前方・上方に移動。",
+                        difficulty: "medium",
+                        commonMistakes: ["「エー」で終わらせてしまう", "二つの音に分けすぎる", "日本語の「エイ」と同じにする"],
+                        tips: ["滑らかに移動", "最初は「エ」、最後は「イ」", "一続きの音として発音"],
+                        technicalNotes: "日本語の「エイ」はしばしば長母音化するが、英語ではしっかり舌が動く。",
+                        confusedWith: "/e/ (短いエ), /iː/ (長いイー), /aɪ/ (アイ二重母音)",
+                        minimalPairs: "say /seɪ/ vs see /siː/, pain /peɪn/ vs pen /pen/",
+                        phoneticContext: "語尾や開音節でよく現れる。英語の基本的な二重母音。",
+                        frequency: "英語で高頻度の二重母音"
+                    },
+                    {
+                        symbol: "aɪ",
+                        name: "Long I",
+                        description: "「アイ」二重母音",
+                        category: "二重母音",
+                        examples: ["I", "fly", "pie", "time", "my", "like"],
+                        japaneseGuide: "しっかり「ア」から「イ」へ。最初の「ア」は日本語より奥まった音。一息で発音する。",
+                        bodyInstructions: "大きく口を開けて「ア」から始まり、「イ」で終わる。口を丸めて大きく開けてから「イ」へ移行。",
+                        difficulty: "medium",
+                        commonMistakes: ["「アー」で終わらせてしまう", "最初の「ア」が不十分", "2つの音に分けすぎる"],
+                        tips: ["最初はしっかり口を開けて「ア」", "滑らかに「イ」へ移動", "一息で発音"],
+                        technicalNotes: "日本語の「アイ」より滑らか。低舌音から高舌音への移行が特徴。",
+                        confusedWith: "/ɑː/ (長いア), /eɪ/ (エイ二重母音), /ɔɪ/ (オイ二重母音)",
+                        minimalPairs: "I /aɪ/ vs eye /aɪ/, time /taɪm/ vs team /tiːm/",
+                        phoneticContext: "語尾や開音節でよく現れる。「I」や「my」など基本語で重要。",
+                        frequency: "英語で非常に高頻度の二重母音"
+                    }
+                ]
+            };
+
+            const allSymbols = [...pronunciationData.vowels, ...pronunciationData.consonants, ...pronunciationData.diphthongs];
+
+            const getCurrentData = () => {
+                switch(selectedCategory) {
+                    case 'vowels': return pronunciationData.vowels;
+                    case 'short-vowels': return pronunciationData.vowels.filter(v => v.category === '短母音');
+                    case 'long-vowels': return pronunciationData.vowels.filter(v => v.category === '長母音');
+                    case 'consonants': return pronunciationData.consonants;
+                    case 'diphthongs': return pronunciationData.diphthongs;
+                    case 'all': return allSymbols;
+                    default: return pronunciationData.vowels;
+                }
+            };
+
+            const currentData = getCurrentData();
+            const currentSymbol = currentData[currentSymbolIndex];
+
+            const shouldShowDetails = () => {
+                switch(detailsMode) {
+                    case 'always-open': return true;
+                    case 'always-closed': return false;
+                    case 'manual': return showDetails;
+                    default: return showDetails;
+                }
+            };
+
+            const speakExample = (text) => {
+                if ('speechSynthesis' in window) {
+                    const utterance = new SpeechSynthesisUtterance(text);
+                    utterance.lang = 'en-US';
+                    utterance.rate = 0.6;
+                    speechSynthesis.speak(utterance);
+                }
+            };
+
+            const nextSymbol = () => {
+                setCurrentSymbolIndex((prev) => (prev + 1) % currentData.length);
+                if (detailsMode === 'manual') setShowDetails(false);
+                setShowMouthDiagram(false);
+            };
+
+            const prevSymbol = () => {
+                setCurrentSymbolIndex((prev) => (prev - 1 + currentData.length) % currentData.length);
+                if (detailsMode === 'manual') setShowDetails(false);
+                setShowMouthDiagram(false);
+            };
+
+            const shuffleSymbol = () => {
+                const randomIndex = Math.floor(Math.random() * currentData.length);
+                setCurrentSymbolIndex(randomIndex);
+                if (detailsMode === 'manual') setShowDetails(false);
+                setShowMouthDiagram(false);
+            };
+
+            const getDifficultyBadge = (difficulty) => {
+                switch(difficulty) {
+                    case 'easy': return 'bg-green-100 text-green-700 border-green-200';
+                    case 'medium': return 'bg-orange-100 text-orange-700 border-orange-200';
+                    case 'hard': return 'bg-red-100 text-red-700 border-red-200';
+                    default: return 'bg-gray-100 text-gray-700 border-gray-200';
+                }
+            };
+
+            return (
+                <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+                    <div className="max-w-5xl mx-auto px-4 py-8">
+                        {/* Header */}
+                        <div className="text-center mb-8">
+                            <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl mb-4 shadow-lg">
+                                <span className="text-2xl text-white font-bold">IPA</span>
+                            </div>
+                            <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent mb-2">
+                                発音記号マスター
+                            </h1>
+                            <p className="text-lg text-gray-600 font-medium">美しい発音を身につけよう</p>
+                        </div>
+
+                        {/* Settings Card */}
+                        <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl border border-white/20 p-6 mb-8">
+                            <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                                    <span className="text-sm font-semibold text-gray-700">詳細表示設定</span>
+                                </div>
+                                <select
+                                    value={detailsMode}
+                                    onChange={(e) => setDetailsMode(e.target.value)}
+                                    className="px-4 py-2 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white/70 backdrop-blur-sm"
+                                >
+                                    <option value="manual">手動切り替え</option>
+                                    <option value="always-open">常に表示</option>
+                                    <option value="always-closed">常に非表示</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        {/* Category Pills */}
+                        <div className="flex justify-center gap-3 mb-8 flex-wrap">
+                            {[
+                                { key: 'vowels', label: '母音', count: pronunciationData.vowels.length, emoji: '🔤' },
+                                { key: 'short-vowels', label: '短母音', count: pronunciationData.vowels.filter(v => v.category === '短母音').length, emoji: '⚡' },
+                                { key: 'long-vowels', label: '長母音', count: pronunciationData.vowels.filter(v => v.category === '長母音').length, emoji: '➡️' },
+                                { key: 'diphthongs', label: '二重母音', count: pronunciationData.diphthongs.length, emoji: '🌊' },
+                                { key: 'consonants', label: '子音', count: pronunciationData.consonants.length, emoji: '🎯' },
+                                { key: 'all', label: '全て', count: allSymbols.length, emoji: '📚' }
+                            ].map(({ key, label, count, emoji }) => (
+                                <button
+                                    key={key}
+                                    onClick={() => {
+                                        setSelectedCategory(key);
+                                        setCurrentSymbolIndex(0);
+                                        if (detailsMode === 'manual') setShowDetails(false);
+                                        setShowMouthDiagram(false);
+                                    }}
+                                    className={`px-5 py-3 rounded-2xl text-sm font-semibold transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 ${
+                                        selectedCategory === key 
+                                            ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-blue-200' 
+                                            : 'bg-white/80 backdrop-blur-sm text-gray-700 hover:bg-white border border-white/20'
+                                    }`}
+                                >
+                                    <span className="mr-2">{emoji}</span>
+                                    {label} ({count})
+                                </button>
+                            ))}
+                        </div>
+
+                        {/* Main Card */}
+                        <div className="bg-white/90 backdrop-blur-lg rounded-3xl shadow-2xl border border-white/20 overflow-hidden">
+                            {/* Symbol Display */}
+                            <div className="relative bg-gradient-to-br from-blue-50 to-indigo-50 p-12 text-center">
+                                <div className="absolute top-6 right-6">
+                                    <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold border ${getDifficultyBadge(currentSymbol.difficulty)}`}>
+                                        {currentSymbol.difficulty === 'easy' && '🟢'}
+                                        {currentSymbol.difficulty === 'medium' && '🟡'}
+                                        {currentSymbol.difficulty === 'hard' && '🔴'}
+                                        <span className="ml-1">
+                                            {currentSymbol.difficulty === 'easy' && '簡単'}
+                                            {currentSymbol.difficulty === 'medium' && '普通'}
+                                            {currentSymbol.difficulty === 'hard' && '難しい'}
+                                        </span>
+                                    </span>
+                                </div>
+                                
+                                <div className="mb-6">
+                                    <div className="text-8xl font-mono text-transparent bg-gradient-to-br from-blue-600 to-indigo-700 bg-clip-text mb-4 tracking-wider">
+                                        /{currentSymbol.symbol}/
+                                    </div>
+                                    <h2 className="text-3xl font-bold text-gray-800 mb-2">{currentSymbol.name}</h2>
+                                    <p className="text-lg text-gray-600 mb-4">{currentSymbol.description}</p>
+                                    <div className="flex justify-center gap-4 text-sm text-gray-500">
+                                        <span>📊 {currentSymbol.category}</span>
+                                        <span>🔄 {currentSymbol.frequency}</span>
+                                    </div>
+                                </div>
+
+                                {/* Action Buttons */}
+                                <div className="flex justify-center gap-4 mb-6">
+                                    <button
+                                        onClick={() => speakExample(currentSymbol.examples[0])}
+                                        className="flex items-center gap-2 bg-white/80 backdrop-blur-sm hover:bg-white text-blue-600 px-6 py-3 rounded-2xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 border border-white/20"
+                                    >
+                                        <Play className="w-5 h-5" />
+                                        <span className="font-medium">音声再生</span>
+                                    </button>
+                                    <button
+                                        onClick={() => setShowMouthDiagram(!showMouthDiagram)}
+                                        className="flex items-center gap-2 bg-white/80 backdrop-blur-sm hover:bg-white text-green-600 px-6 py-3 rounded-2xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 border border-white/20"
+                                    >
+                                        <Eye className="w-5 h-5" />
+                                        <span className="font-medium">詳細情報</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            {/* Content Area */}
+                            <div className="p-8">
+                                {/* Mouth Diagram */}
+                                {showMouthDiagram && (
+                                    <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl p-6 mb-6 border border-green-100">
+                                        <h3 className="text-lg font-bold text-green-800 mb-4 flex items-center gap-2">
+                                            <span>📊</span>調音情報
+                                        </h3>
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                                            <div className="bg-white/50 rounded-xl p-4">
+                                                <strong className="text-green-700">音声的文脈:</strong>
+                                                <p className="text-green-600 mt-1">{currentSymbol.phoneticContext}</p>
+                                            </div>
+                                            <div className="bg-white/50 rounded-xl p-4">
+                                                <strong className="text-green-700">混同しやすい音:</strong>
+                                                <p className="text-green-600 mt-1">{currentSymbol.confusedWith}</p>
+                                            </div>
+                                            <div className="md:col-span-2 bg-white/50 rounded-xl p-4">
+                                                <strong className="text-green-700">最小対立語:</strong>
+                                                <p className="text-green-600 mt-1">{currentSymbol.minimalPairs}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Examples */}
+                                <div className="mb-8">
+                                    <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                                        <span>📝</span>例文
+                                    </h3>
+                                    <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                                        {currentSymbol.examples.map((example, index) => (
+                                            <button
+                                                key={index}
+                                                onClick={() => speakExample(example)}
+                                                className="group text-left p-4 bg-gray-50 hover:bg-gray-100 rounded-2xl transition-all duration-200 flex items-center gap-3 border border-gray-100 hover:border-gray-200 hover:shadow-md"
+                                            >
+                                                <div className="flex-shrink-0 w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center group-hover:bg-blue-200 transition-colors">
+                                                    <Volume2 className="w-4 h-4 text-blue-600" />
+                                                </div>
+                                                <span className="font-medium text-gray-700">{example}</span>
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* Details Toggle */}
+                                {detailsMode === 'manual' && (
+                                    <div className="text-center mb-8">
+                                        <button
+                                            onClick={() => setShowDetails(!showDetails)}
+                                            className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 font-semibold px-6 py-3 rounded-2xl hover:bg-blue-50 transition-all duration-200"
+                                        >
+                                            <Info className="w-5 h-5" />
+                                            {showDetails ? '詳細を隠す' : '詳細情報を表示'}
+                                        </button>
+                                    </div>
+                                )}
+
+                                {/* Detailed Information */}
+                                {shouldShowDetails() && (
+                                    <div className="space-y-6">
+                                        <div className="bg-gradient-to-r from-blue-50 to-cyan-50 rounded-2xl p-6 border border-blue-100">
+                                            <h4 className="text-blue-800 font-bold mb-3 flex items-center gap-2 text-lg">
+                                                <span>🇯🇵</span>日本語ガイド
+                                            </h4>
+                                            <p className="text-blue-700 leading-relaxed">{currentSymbol.japaneseGuide}</p>
+                                        </div>
+
+                                        <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl p-6 border border-green-100">
+                                            <h4 className="text-green-800 font-bold mb-3 flex items-center gap-2 text-lg">
+                                                <span>🎯</span>発音のコツ
+                                            </h4>
+                                            <p className="text-green-700 leading-relaxed">{currentSymbol.bodyInstructions}</p>
+                                        </div>
+
+                                        <div className="bg-gradient-to-r from-red-50 to-pink-50 rounded-2xl p-6 border border-red-100">
+                                            <h4 className="text-red-800 font-bold mb-3 flex items-center gap-2 text-lg">
+                                                <span>❌</span>よくある間違い
+                                            </h4>
+                                            <ul className="text-red-700 space-y-2">
+                                                {currentSymbol.commonMistakes.map((mistake, index) => (
+                                                    <li key={index} className="flex items-start gap-3">
+                                                        <span className="flex-shrink-0 w-5 h-5 bg-red-100 rounded-full flex items-center justify-center mt-0.5">
+                                                            <span className="text-xs">•</span>
+                                                        </span>
+                                                        <span className="leading-relaxed">{mistake}</span>
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        </div>
+
+                                        <div className="bg-gradient-to-r from-yellow-50 to-orange-50 rounded-2xl p-6 border border-yellow-100">
+                                            <h4 className="text-yellow-800 font-bold mb-3 flex items-center gap-2 text-lg">
+                                                <span>💡</span>練習のコツ
+                                            </h4>
+                                            <ul className="text-yellow-700 space-y-2">
+                                                {currentSymbol.tips.map((tip, index) => (
+                                                    <li key={index} className="flex items-start gap-3">
+                                                        <span className="flex-shrink-0 w-5 h-5 bg-yellow-100 rounded-full flex items-center justify-center mt-0.5">
+                                                            <span className="text-xs">✓</span>
+                                                        </span>
+                                                        <span className="leading-relaxed">{tip}</span>
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        </div>
+
+                                        <div className="bg-gradient-to-r from-gray-50 to-slate-50 rounded-2xl p-6 border border-gray-100">
+                                            <h4 className="text-gray-800 font-bold mb-3 flex items-center gap-2 text-lg">
+                                                <span>🔬</span>技術的ノート
+                                            </h4>
+                                            <p className="text-gray-700 leading-relaxed">{currentSymbol.technicalNotes}</p>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Navigation */}
+                        <div className="flex justify-between items-center mt-8">
+                            <button
+                                onClick={prevSymbol}
+                                className="flex items-center gap-3 bg-white/80 backdrop-blur-sm hover:bg-white text-gray-700 px-8 py-4 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5 border border-white/20"
+                            >
+                                <ChevronLeft className="w-5 h-5" />
+                                <span className="font-semibold">前へ</span>
+                            </button>
+                            
+                            <div className="flex items-center gap-4">
+                                <div className="text-center">
+                                    <div className="text-sm text-gray-500 mb-1">進捗</div>
+                                    <div className="text-lg font-bold text-gray-700">
+                                        {currentSymbolIndex + 1} / {currentData.length}
+                                    </div>
+                                </div>
+                                <button
+                                    onClick={shuffleSymbol}
+                                    className="bg-white/80 backdrop-blur-sm hover:bg-white text-green-600 p-4 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5 border border-white/20"
+                                >
+                                    <Shuffle className="w-5 h-5" />
+                                </button>
+                            </div>
+                            
+                            <button
+                                onClick={nextSymbol}
+                                className="flex items-center gap-3 bg-white/80 backdrop-blur-sm hover:bg-white text-gray-700 px-8 py-4 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5 border border-white/20"
+                            >
+                                <span className="font-semibold">次へ</span>
+                                <ChevronRight className="w-5 h-5" />
+                            </button>
+                        </div>
+
+                        {/* Progress Dots */}
+                        <div className="flex justify-center gap-2 mt-8 flex-wrap max-w-2xl mx-auto">
+                            {currentData.map((_, index) => (
+                                <button
+                                    key={index}
+                                    onClick={() => {
+                                        setCurrentSymbolIndex(index);
+                                        if (detailsMode === 'manual') setShowDetails(false);
+                                        setShowMouthDiagram(false);
+                                    }}
+                                    className={`w-3 h-3 rounded-full transition-all duration-200 transform hover:scale-125 ${
+                                        index === currentSymbolIndex 
+                                            ? 'bg-gradient-to-r from-blue-500 to-indigo-600 shadow-lg' 
+                                            : 'bg-gray-300 hover:bg-gray-400'
+                                    }`}
+                                />
+                            ))}
+                        </div>
+
+                        {/* Footer */}
+                        <div className="text-center mt-12 py-8">
+                            <p className="text-gray-500 text-sm">
+                                美しい発音で、自信を持って英語を話そう ✨
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<PronunciationApp />);
+    </script>
+</body>
+</html>
