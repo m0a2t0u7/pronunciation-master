@@ -1,0 +1,1140 @@
+import React, { useState } from 'react';
+import { ChevronLeft, ChevronRight, Volume2, Info, Shuffle, Eye, Play } from 'lucide-react';
+
+const PronunciationApp = () => {
+  const [currentSymbolIndex, setCurrentSymbolIndex] = useState(0);
+  const [showDetails, setShowDetails] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState('vowels');
+  const [detailsMode, setDetailsMode] = useState('manual');
+  const [showMouthDiagram, setShowMouthDiagram] = useState(false);
+
+  const pronunciationData = {
+    vowels: [
+      {
+        symbol: "ɪ",
+        name: "Short I",
+        description: "短い「イ」の音",
+        category: "短母音",
+        examples: ["sit", "hit", "lip", "ship", "fish", "big"],
+        japaneseGuide: "日本語の「イ」に近い短い母音。口を横に引きすぎないように注意。短くはっきりと発声する。",
+        bodyInstructions: "口はあまり大きく開かず、リラックスした状態で舌を中央やや上に置く。上あごとの隙間を狭くする。",
+        difficulty: "easy",
+        commonMistakes: ["日本語の「イ」と同じにしてしまう", "長く伸ばしてしまう", "口を横に広げすぎる"],
+        tips: ["口をあまり横に広げすぎない", "舌の位置は中央やや上", "短く切るように発音"],
+        technicalNotes: "短母音/ɪ/は日本語の「イ」より少し低く、/iː/との区別が重要。舌の高さと緊張度が/iː/より低い。",
+        confusedWith: "/iː/ (長いイー), /e/ (短いエ)",
+        minimalPairs: "sheep /ʃiːp/ vs ship /ʃɪp/, feel /fiːl/ vs fill /fɪl/",
+        phoneticContext: "語中・語尾に多く現れる。閉音節でよく使われる。",
+        frequency: "英語で最も頻出する母音の一つ"
+      },
+      {
+        symbol: "iː",
+        name: "Long E",
+        description: "長い「イー」の音",
+        category: "長母音",
+        examples: ["see", "feet", "tree", "cheese", "key", "machine"],
+        japaneseGuide: "日本語の「イー」を長く伸ばす感じ。口を横に広げて、張りのある音。舌の位置は/ɪ/より高く緊張させる。",
+        bodyInstructions: "笑顔を作るように口角を上げて、舌の前を天井に近づける。その状態のまま音を長めに伸ばして発音。",
+        difficulty: "easy",
+        commonMistakes: ["短くしてしまう", "口を十分に横に広げない", "/ɪ/と区別できない"],
+        tips: ["笑顔を作るような口の形", "舌の前部を天井に近づける", "しっかり長く伸ばす"],
+        technicalNotes: "短母音/ɪ/との対比で練習。音の長さだけでなく質も異なる。閉じた前舌高母音。",
+        confusedWith: "/ɪ/ (短いイ), /eɪ/ (エイ二重母音)",
+        minimalPairs: "sheep /ʃiːp/ vs ship /ʃɪp/, beat /biːt/ vs bit /bɪt/",
+        phoneticContext: "開音節や語尾に多く現れる。",
+        frequency: "英語母音の中で高頻度"
+      },
+      {
+        symbol: "e",
+        name: "Short E",
+        description: "短い「エ」の音",
+        category: "短母音",
+        examples: ["pen", "head", "egg", "dress", "ten", "vet"],
+        japaneseGuide: "日本語の「エ」に近い音。口を自然にやや開き、舌は中央前方に置く。",
+        bodyInstructions: "口を軽く横に引いた形で、舌先は口の前寄りに置き、舌全体は平らに保つ。",
+        difficulty: "easy",
+        commonMistakes: ["日本語の「エ」と完全に同じにしてしまう", "/æ/と混同する"],
+        tips: ["口を自然に開く", "舌は前方中央", "リラックスした「エ」"],
+        technicalNotes: "前舌中低母音。日本語の「エ」とほぼ同じだが、英語では少しリラックスした音。",
+        confusedWith: "/æ/ (短いア), /ɪ/ (短いイ)",
+        minimalPairs: "pen /pen/ vs pan /pæn/, bet /bet/ vs bat /bæt/",
+        phoneticContext: "主に閉音節で現れる。",
+        frequency: "英語で頻出する母音"
+      },
+      {
+        symbol: "æ",
+        name: "Short A",
+        description: "広い「ア」の音",
+        category: "短母音",
+        examples: ["cat", "hat", "man", "apple", "back", "family"],
+        japaneseGuide: "日本語の「ア」と「エ」の中間のような音。「エ」の口で「ア」と発声する。",
+        bodyInstructions: "口を横に大きく開き、舌を前で低く保つ。口腔内のスペースを広めに保つ。",
+        difficulty: "medium",
+        commonMistakes: ["日本語の「ア」と同じにしてしまう", "口を縦に開いてしまう", "/ʌ/と混同する"],
+        tips: ["口を横に大きく開く", "舌を前で低く保つ", "「エ」の口で「ア」と発声"],
+        technicalNotes: "前舌低母音で、舌は最も低い位置。口の形は「エ」寄りで音は「ア」。",
+        confusedWith: "/ʌ/ (短いア), /ɑː/ (長いアー), /e/ (短いエ)",
+        minimalPairs: "cat /kæt/ vs cut /kʌt/, pan /pæn/ vs pen /pen/",
+        phoneticContext: "主に閉音節で現れる。アメリカ英語の特徴的な音。",
+        frequency: "英語で非常に頻出する母音"
+      },
+      {
+        symbol: "ʌ",
+        name: "Short U",
+        description: "短い「ア」の音",
+        category: "短母音",
+        examples: ["cup", "run", "love", "mother", "money", "enough"],
+        japaneseGuide: "日本語の「ア」に近いが、もう少し奥まった音。口を軽く開いて、舌を中央に置く。",
+        bodyInstructions: "口を縦に軽く開き、舌を口の中央でリラックスさせる。/æ/より口の開きは小さく。",
+        difficulty: "medium",
+        commonMistakes: ["/æ/と混同する", "日本語の「ア」と同じにする", "口を開きすぎる"],
+        tips: ["/æ/より口を小さく開く", "舌を中央でリラックス", "短くはっきりと"],
+        technicalNotes: "中舌中低母音。/æ/より後ろで高い位置。強勢のない音節では/ə/になることが多い。",
+        confusedWith: "/æ/ (広いア), /ə/ (シュワ), /ɑː/ (長いア)",
+        minimalPairs: "cut /kʌt/ vs cat /kæt/, but /bʌt/ vs bat /bæt/",
+        phoneticContext: "主に閉音節で現れる。強勢のある音節に多い。",
+        frequency: "英語で非常に頻出する母音"
+      },
+      {
+        symbol: "ɑː",
+        name: "Long A",
+        description: "長い「アー」の音",
+        category: "長母音",
+        examples: ["car", "heart", "start", "father", "party", "calm"],
+        japaneseGuide: "日本語の「アー」に近い音。口を大きく開けて、舌を低く保ちながら長く伸ばす。",
+        bodyInstructions: "口を縦に大きく開け、舌を口の底に近づけて平らに保つ。のどの奥を開ける感じ。",
+        difficulty: "easy",
+        commonMistakes: ["短くしてしまう", "/ʌ/と混同する", "口を十分に開けない"],
+        tips: ["口を大きく縦に開ける", "舌を低く保つ", "しっかり長く伸ばす"],
+        technicalNotes: "後舌低母音。アメリカ英語では/ɒ/と区別されない。イギリス英語では区別される。",
+        confusedWith: "/ʌ/ (短いア), /æ/ (広いア), /ɒ/ (短いオ)",
+        minimalPairs: "heart /hɑːt/ vs hut /hʌt/, car /kɑː/ vs cut /kʌt/",
+        phoneticContext: "主に開音節や/r/の前で現れる。",
+        frequency: "英語で高頻度の長母音"
+      },
+      {
+        symbol: "ɒ",
+        name: "Short O",
+        description: "短い「オ」の音",
+        category: "短母音",
+        examples: ["hot", "dog", "shop", "coffee", "box", "wrong"],
+        japaneseGuide: "日本語の「オ」に近いが、もう少し口を大きく開ける。唇は丸めない。",
+        bodyInstructions: "口を縦に開き、舌を後ろで低く保つ。唇は丸めずに自然な形で。",
+        difficulty: "medium",
+        commonMistakes: ["唇を丸めてしまう", "/ɔː/と混同する", "日本語の「オ」と同じにする"],
+        tips: ["唇は丸めない", "口を縦に開ける", "舌を後ろで低く"],
+        technicalNotes: "後舌低母音。アメリカ英語では/ɑː/と区別されないことが多い。イギリス英語では明確に区別。",
+        confusedWith: "/ɔː/ (長いオー), /ɑː/ (長いアー), /oʊ/ (オウ二重母音)",
+        minimalPairs: "hot /hɒt/ vs heart /hɑːt/, dog /dɒɡ/ vs door /dɔː/",
+        phoneticContext: "主に閉音節で現れる。イギリス英語で重要。",
+        frequency: "イギリス英語で頻出"
+      },
+      {
+        symbol: "ɔː",
+        name: "Long O",
+        description: "長い「オー」の音",
+        category: "長母音",
+        examples: ["door", "more", "call", "walk", "thought", "caught"],
+        japaneseGuide: "日本語の「オー」に近いが、唇を少し丸めて長く伸ばす。",
+        bodyInstructions: "唇を軽く丸めて、舌を後ろで中程度の高さに保ち、長く発音する。",
+        difficulty: "easy",
+        commonMistakes: ["短くしてしまう", "/ɒ/と混同する", "唇を丸めすぎる"],
+        tips: ["唇を軽く丸める", "しっかり長く伸ばす", "舌は後ろで中位"],
+        technicalNotes: "後舌中高母音。/ɒ/より高く、唇の丸めがある。",
+        confusedWith: "/ɒ/ (短いオ), /oʊ/ (オウ二重母音), /uː/ (長いウー)",
+        minimalPairs: "door /dɔː/ vs dog /dɒɡ/, call /kɔːl/ vs coal /koʊl/",
+        phoneticContext: "開音節や特定の文字組み合わせで現れる。",
+        frequency: "英語で中程度の頻度"
+      },
+      {
+        symbol: "ʊ",
+        name: "Short U",
+        description: "短い「ウ」の音",
+        category: "短母音",
+        examples: ["good", "book", "put", "could", "woman", "push"],
+        japaneseGuide: "日本語の「ウ」に近いが、唇をあまり突き出さない。舌を後ろで高めに保つ。",
+        bodyInstructions: "唇を軽く丸めるが突き出さず、舌を後ろで高く保つ。口の奥を狭める。",
+        difficulty: "medium",
+        commonMistakes: ["/uː/と混同する", "唇を突き出しすぎる", "日本語の「ウ」と同じにする"],
+        tips: ["唇は軽く丸めるだけ", "舌を後ろで高く", "短くはっきりと"],
+        technicalNotes: "後舌高母音。/uː/より短く、緊張度が低い。",
+        confusedWith: "/uː/ (長いウー), /ʌ/ (短いア), /oʊ/ (オウ二重母音)",
+        minimalPairs: "good /ɡʊd/ vs gooed /ɡuːd/, put /pʊt/ vs putt /pʌt/",
+        phoneticContext: "特定の単語でのみ現れる。不規則な綴りが多い。",
+        frequency: "英語で中程度の頻度"
+      },
+      {
+        symbol: "uː",
+        name: "Long U",
+        description: "長い「ウー」の音",
+        category: "長母音",
+        examples: ["food", "moon", "blue", "true", "group", "school"],
+        japaneseGuide: "日本語の「ウー」に近いが、唇をしっかり丸めて長く伸ばす。",
+        bodyInstructions: "唇をしっかり丸めて前に出し、舌を後ろで高く保ち、長く発音する。",
+        difficulty: "easy",
+        commonMistakes: ["短くしてしまう", "/ʊ/と混同する", "唇を十分に丸めない"],
+        tips: ["唇をしっかり丸める", "舌を後ろで高く", "長く伸ばす"],
+        technicalNotes: "後舌高母音。/ʊ/より長く、緊張度が高い。",
+        confusedWith: "/ʊ/ (短いウ), /oʊ/ (オウ二重母音), /juː/ (ユー音)",
+        minimalPairs: "food /fuːd/ vs foot /fʊt/, pool /puːl/ vs pull /pʊl/",
+        phoneticContext: "開音節や特定の文字組み合わせで現れる。",
+        frequency: "英語で中程度の頻度"
+      },
+      {
+        symbol: "ə",
+        name: "Schwa",
+        description: "あいまい母音「シュワ」",
+        category: "短母音",
+        examples: ["about", "teacher", "China", "banana", "element", "photograph"],
+        japaneseGuide: "あいまいな「ア」の音。力を抜いてリラックスした状態で発音する。",
+        bodyInstructions: "口をリラックスして軽く開け、舌を中央に置く。力を入れずに自然に発音。",
+        difficulty: "medium",
+        commonMistakes: ["はっきり発音しすぎる", "他の母音で代用する", "強く発音してしまう"],
+        tips: ["力を抜いてリラックス", "弱く短く発音", "口の形は自然に"],
+        technicalNotes: "英語で最も頻出する音。強勢のない音節で現れる。中舌中母音。",
+        confusedWith: "/ʌ/ (短いア), /ɪ/ (短いイ)",
+        minimalPairs: "about /əˈbaʊt/ vs abut /əˈbʌt/, teacher /ˈtiːtʃə/ vs teaches /ˈtiːtʃɪz/",
+        phoneticContext: "強勢のない音節でのみ現れる。英語のリズムに重要。",
+        frequency: "英語で最も頻出する音"
+      }
+    ],
+    consonants: [
+      {
+        symbol: "p",
+        name: "P",
+        description: "無声両唇破裂音",
+        category: "破裂音",
+        examples: ["pen", "happy", "stop", "apple", "paper", "cup"],
+        japaneseGuide: "日本語の「パ」行に近い音。唇を閉じて破裂させる。語頭では息を強く出す。",
+        bodyInstructions: "唇をしっかり閉じてから勢いよく開き、息を勢いよく出す。語頭では特に強く。",
+        difficulty: "easy",
+        commonMistakes: ["息が弱い", "語頭で息を出さない", "日本語と同じ強さで発音"],
+        tips: ["語頭では息を強く", "唇をしっかり閉じる", "破裂音を意識"],
+        technicalNotes: "無声音。語頭では帯気音になる。日本語より息が強い。",
+        confusedWith: "/b/ (有声両唇破裂音)",
+        minimalPairs: "pen /pen/ vs ben /ben/, cup /kʌp/ vs cub /kʌb/",
+        phoneticContext: "語頭、語中、語尾すべてに現れる。",
+        frequency: "英語で高頻度"
+      },
+      {
+        symbol: "b",
+        name: "B",
+        description: "有声両唇破裂音",
+        category: "破裂音",
+        examples: ["book", "baby", "job", "table", "about", "club"],
+        japaneseGuide: "日本語の「バ」行に近い音。声帯を震わせながら唇で破裂させる。",
+        bodyInstructions: "唇を閉じて声帯を震わせ、唇を開いて破裂させる。息は/p/より弱い。",
+        difficulty: "easy",
+        commonMistakes: ["/p/と混同する", "声が出ていない", "息が強すぎる"],
+        tips: ["声帯を震わせる", "息は弱めに", "唇の破裂を意識"],
+        technicalNotes: "有声音。語尾では声が弱くなることがある。",
+        confusedWith: "/p/ (無声両唇破裂音)",
+        minimalPairs: "big /bɪɡ/ vs pig /pɪɡ/, cab /kæb/ vs cap /kæp/",
+        phoneticContext: "語頭、語中、語尾すべてに現れる。",
+        frequency: "英語で高頻度"
+      },
+      {
+        symbol: "t",
+        name: "T",
+        description: "無声歯茎破裂音",
+        category: "破裂音",
+        examples: ["ten", "water", "cat", "letter", "better", "sit"],
+        japaneseGuide: "日本語の「タ」行に近いが、舌先を歯茎に付ける。語頭では息を強く出す。",
+        bodyInstructions: "舌先を歯茎に押し付けてから勢いよく離し、息を強く出す。",
+        difficulty: "medium",
+        commonMistakes: ["舌の位置が違う", "息が弱い", "フラップ音になってしまう"],
+        tips: ["舌先を歯茎に", "語頭では息を強く", "はっきりした破裂音"],
+        technicalNotes: "無声音。語頭では帯気音。アメリカ英語では語中でフラップ音になることがある。",
+        confusedWith: "/d/ (有声歯茎破裂音), /ɾ/ (フラップ音)",
+        minimalPairs: "ten /ten/ vs den /den/, cat /kæt/ vs cad /kæd/",
+        phoneticContext: "語頭、語中、語尾すべてに現れる。",
+        frequency: "英語で非常に高頻度"
+      },
+      {
+        symbol: "d",
+        name: "D",
+        description: "有声歯茎破裂音",
+        category: "破裂音",
+        examples: ["dog", "middle", "red", "hand", "good", "word"],
+        japaneseGuide: "日本語の「ダ」行に近いが、舌先を歯茎に付ける。声帯を震わせる。",
+        bodyInstructions: "舌先を歯茎に押し付けて声帯を震わせ、舌を離して破裂させる。",
+        difficulty: "medium",
+        commonMistakes: ["/t/と混同する", "声が出ていない", "舌の位置が違う"],
+        tips: ["声帯を震わせる", "舌先を歯茎に", "息は弱めに"],
+        technicalNotes: "有声音。語尾では声が弱くなることがある。",
+        confusedWith: "/t/ (無声歯茎破裂音)",
+        minimalPairs: "do /duː/ vs to /tuː/, bad /bæd/ vs bat /bæt/",
+        phoneticContext: "語頭、語中、語尾すべてに現れる。",
+        frequency: "英語で非常に高頻度"
+      },
+      {
+        symbol: "k",
+        name: "K",
+        description: "無声軟口蓋破裂音",
+        category: "破裂音",
+        examples: ["cat", "back", "school", "work", "thank", "book"],
+        japaneseGuide: "日本語の「カ」行に近い音。舌の奥を軟口蓋に付けて破裂させる。",
+        bodyInstructions: "舌の奥を軟口蓋（のどちんこの手前）に押し付けてから勢いよく離す。",
+        difficulty: "easy",
+        commonMistakes: ["/ɡ/と混同する", "息が弱い", "舌の位置が前すぎる"],
+        tips: ["舌の奥を使う", "語頭では息を強く", "のどの奥で破裂"],
+        technicalNotes: "無声音。語頭では帯気音になる。",
+        confusedWith: "/ɡ/ (有声軟口蓋破裂音)",
+        minimalPairs: "cat /kæt/ vs gat /ɡæt/, back /bæk/ vs bag /bæɡ/",
+        phoneticContext: "語頭、語中、語尾すべてに現れる。",
+        frequency: "英語で高頻度"
+      },
+      {
+        symbol: "ɡ",
+        name: "G",
+        description: "有声軟口蓋破裂音",
+        category: "破裂音",
+        examples: ["go", "big", "dog", "begin", "finger", "bag"],
+        japaneseGuide: "日本語の「ガ」行に近い音。舌の奥を軟口蓋に付けて声帯を震わせながら破裂。",
+        bodyInstructions: "舌の奥を軟口蓋に押し付けて声帯を震わせ、舌を離して破裂させる。",
+        difficulty: "easy",
+        commonMistakes: ["/k/と混同する", "声が出ていない", "息が強すぎる"],
+        tips: ["声帯を震わせる", "舌の奥を使う", "息は弱めに"],
+        technicalNotes: "有声音。語尾では声が弱くなることがある。",
+        confusedWith: "/k/ (無声軟口蓋破裂音)",
+        minimalPairs: "go /ɡoʊ/ vs cow /kaʊ/, big /bɪɡ/ vs pick /pɪk/",
+        phoneticContext: "語頭、語中、語尾すべてに現れる。",
+        frequency: "英語で高頻度"
+      },
+      {
+        symbol: "f",
+        name: "F",
+        description: "無声唇歯摩擦音",
+        category: "摩擦音",
+        examples: ["fish", "coffee", "laugh", "phone", "stuff", "half"],
+        japaneseGuide: "下唇を上の歯に軽く当てて「フ」の音。息だけで声は出さない。",
+        bodyInstructions: "下唇を上の前歯に軽く当て、その隙間から息を「フー」っと出す。",
+        difficulty: "easy",
+        commonMistakes: ["/v/と混同する", "唇を噛みすぎる", "日本語の「フ」と同じにする"],
+        tips: ["下唇を上の歯に軽く当てる", "息だけを出す", "声は出さない"],
+        technicalNotes: "無声摩擦音。/v/との区別が重要。",
+        confusedWith: "/v/ (有声唇歯摩擦音), /θ/ (無声歯間摩擦音)",
+        minimalPairs: "fan /fæn/ vs van /væn/, half /hæf/ vs have /hæv/",
+        phoneticContext: "語頭、語中、語尾すべてに現れる。",
+        frequency: "英語で中程度の頻度"
+      },
+      {
+        symbol: "v",
+        name: "V",
+        description: "有声唇歯摩擦音",
+        category: "摩擦音",
+        examples: ["very", "love", "give", "river", "seven", "have"],
+        japaneseGuide: "下唇を上の歯に軽く当てて声帯を震わせながら「ヴ」の音。日本語にはない音。",
+        bodyInstructions: "下唇を上の前歯に軽く当て、声帯を震わせながら息を出す。",
+        difficulty: "medium",
+        commonMistakes: ["/f/と混同する", "「バ」で代用する", "声が出ていない"],
+        tips: ["声帯を震わせる", "下唇を軽く歯に当てる", "「ヴ」の音を意識"],
+        technicalNotes: "有声摩擦音。日本語にない音で習得が難しい。",
+        confusedWith: "/f/ (無声唇歯摩擦音), /b/ (有声両唇破裂音)",
+        minimalPairs: "very /ˈveri/ vs ferry /ˈferi/, save /seɪv/ vs safe /seɪf/",
+        phoneticContext: "語頭、語中、語尾すべてに現れる。",
+        frequency: "英語で中程度の頻度"
+      },
+      {
+        symbol: "θ",
+        name: "Voiceless TH",
+        description: "舌を噛む無声音",
+        category: "摩擦音",
+        examples: ["think", "three", "mouth", "birthday", "tooth", "nothing"],
+        japaneseGuide: "日本語にない子音。舌を軽く噛んで「ス」の音。息だけで声は出さない。",
+        bodyInstructions: "舌先を歯の間に軽く挟み、両側から息を「スー」っと漏らす。舌が少し見えるくらい前に出す。",
+        difficulty: "hard",
+        commonMistakes: ["「サ」「ス」で代用してしまう", "舌を深く噛みすぎる", "/s/と混同する"],
+        tips: ["舌先だけを軽く噛む", "息だけを出して声は出さない", "舌が見えるように"],
+        technicalNotes: "英語では/θ/と/s/は別の音。/s/は舌先を歯茎に近づけるが挟まれない。",
+        confusedWith: "/s/ (歯茎摩擦音), /f/ (唇歯摩擦音), /t/ (破裂音)",
+        minimalPairs: "think /θɪŋk/ vs sink /sɪŋk/, three /θriː/ vs tree /triː/",
+        phoneticContext: "語頭、語中、語尾すべてに現れる。特に語尾でよく使われる。",
+        frequency: "英語で中程度の頻度"
+      },
+      {
+        symbol: "ð",
+        name: "Voiced TH",
+        description: "舌を噛む有声音",
+        category: "摩擦音",
+        examples: ["this", "that", "mother", "weather", "breathe", "with"],
+        japaneseGuide: "θと同じ舌の位置で声帯を震わせる。「ズ」のような音になる。",
+        bodyInstructions: "舌先を歯の間に軽く挟み、声帯を震わせながら息を出す。",
+        difficulty: "hard",
+        commonMistakes: ["/θ/と混同する", "「ザ」「ズ」で代用する", "声が出ていない"],
+        tips: ["声帯を震わせる", "舌の位置は/θ/と同じ", "「ズ」の音を意識"],
+        technicalNotes: "有声摩擦音。/θ/との区別が重要。機能語によく現れる。",
+        confusedWith: "/θ/ (無声歯間摩擦音), /z/ (有声歯茎摩擦音), /d/ (有声歯茎破裂音)",
+        minimalPairs: "this /ðɪs/ vs miss /mɪs/, breathe /briːð/ vs breath /breθ/",
+        phoneticContext: "語頭、語中、語尾すべてに現れる。機能語で重要。",
+        frequency: "英語で中程度の頻度"
+      },
+      {
+        symbol: "s",
+        name: "S",
+        description: "無声歯茎摩擦音",
+        category: "摩擦音",
+        examples: ["sun", "house", "nice", "sister", "pass", "city"],
+        japaneseGuide: "日本語の「サ」行に近い音。舌先を歯茎に近づけて「ス」の音。",
+        bodyInstructions: "舌先を歯茎に近づけ（触れない）、狭い隙間から息を「スー」っと出す。",
+        difficulty: "easy",
+        commonMistakes: ["/θ/と混同する", "/z/と混同する", "舌の位置が違う"],
+        tips: ["舌先を歯茎に近づける", "息だけを出す", "はっきりした「ス」"],
+        technicalNotes: "無声摩擦音。/z/との区別が重要。語尾では無声化することがある。",
+        confusedWith: "/z/ (有声歯茎摩擦音), /θ/ (無声歯間摩擦音)",
+        minimalPairs: "sun /sʌn/ vs zun (none), pass /pæs/ vs jazz /dʒæz/",
+        phoneticContext: "語頭、語中、語尾すべてに現れる。複数形でも重要。",
+        frequency: "英語で非常に高頻度"
+      },
+      {
+        symbol: "z",
+        name: "Z",
+        description: "有声歯茎摩擦音",
+        category: "摩擦音",
+        examples: ["zoo", "busy", "was", "music", "buzz", "boys"],
+        japaneseGuide: "/s/と同じ舌の位置で声帯を震わせる。「ズ」の音。",
+        bodyInstructions: "舌先を歯茎に近づけ、声帯を震わせながら息を出す。",
+        difficulty: "easy",
+        commonMistakes: ["/s/と混同する", "声が出ていない", "「ザ」行で代用"],
+        tips: ["声帯を震わせる", "舌の位置は/s/と同じ", "「ズ」の音を意識"],
+        technicalNotes: "有声摩擦音。語尾では無声化することがある。",
+        confusedWith: "/s/ (無声歯茎摩擦音), /ð/ (有声歯間摩擦音)",
+        minimalPairs: "zip /zɪp/ vs sip /sɪp/, buzz /bʌz/ vs bus /bʌs/",
+        phoneticContext: "語頭、語中、語尾すべてに現れる。",
+        frequency: "英語で中程度の頻度"
+      },
+      {
+        symbol: "ʃ",
+        name: "SH",
+        description: "無声後部歯茎摩擦音",
+        category: "摩擦音",
+        examples: ["she", "wash", "fish", "nation", "machine", "resh"],
+        japaneseGuide: "日本語の「シャ」行に近い音。舌を少し奥に引いて「シュ」の音。",
+        bodyInstructions: "舌先を歯茎の少し奥に向け、唇を軽く丸めて「シュー」っと息を出す。",
+        difficulty: "easy",
+        commonMistakes: ["/s/と混同する", "/tʃ/と混同する", "唇を丸めない"],
+        tips: ["舌を少し奥に", "唇を軽く丸める", "「シュ」の音"],
+        technicalNotes: "後部歯茎音。/s/より舌が奥にある。",
+        confusedWith: "/s/ (歯茎摩擦音), /tʃ/ (無声後部歯茎破擦音)",
+        minimalPairs: "she /ʃiː/ vs see /siː/, wash /wɒʃ/ vs was /wɒz/",
+        phoneticContext: "語頭、語中、語尾すべてに現れる。",
+        frequency: "英語で中程度の頻度"
+      },
+      {
+        symbol: "ʒ",
+        name: "ZH",
+        description: "有声後部歯茎摩擦音",
+        category: "摩擦音",
+        examples: ["pleasure", "vision", "azure", "measure", "garage", "beige"],
+        japaneseGuide: "/ʃ/と同じ舌の位置で声帯を震わせる。「ジュ」のような音。",
+        bodyInstructions: "舌先を歯茎の少し奥に向け、声帯を震わせながら息を出す。",
+        difficulty: "medium",
+        commonMistakes: ["/ʃ/と混同する", "/dʒ/と混同する", "声が出ていない"],
+        tips: ["声帯を震わせる", "舌の位置は/ʃ/と同じ", "「ジュ」の音"],
+        technicalNotes: "有声後部歯茎摩擦音。英語では頻度が低い。",
+        confusedWith: "/ʃ/ (無声後部歯茎摩擦音), /dʒ/ (有声後部歯茎破擦音)",
+        minimalPairs: "pleasure /ˈpleʒə/ vs pledger /ˈpledʒə/",
+        phoneticContext: "主に語中に現れる。フランス語由来の単語に多い。",
+        frequency: "英語で低頻度"
+      },
+      {
+        symbol: "h",
+        name: "H",
+        description: "無声声門摩擦音",
+        category: "摩擦音",
+        examples: ["house", "happy", "behind", "hello", "hope", "hospital"],
+        japaneseGuide: "日本語の「ハ」行に近い音。のどから息を出すだけの音。",
+        bodyInstructions: "口の形は次の音に合わせて、のどから息を「ハー」っと出す。",
+        difficulty: "easy",
+        commonMistakes: ["発音しない", "強すぎる", "摩擦音にしてしまう"],
+        tips: ["軽い息の音", "次の音の口の形で", "のどからの息"],
+        technicalNotes: "声門摩擦音。語頭でのみ現れる。弱い子音。",
+        confusedWith: "無音（発音しない）",
+        minimalPairs: "house /haʊs/ vs ouse (none), heat /hiːt/ vs eat /iːt/",
+        phoneticContext: "語頭でのみ現れる。強勢のある音節の前。",
+        frequency: "英語で中程度の頻度"
+      },
+      {
+        symbol: "m",
+        name: "M",
+        description: "両唇鼻音",
+        category: "鼻音",
+        examples: ["man", "home", "summer", "family", "time", "from"],
+        japaneseGuide: "日本語の「マ」行と同じ音。唇を閉じて鼻から音を出す。",
+        bodyInstructions: "唇をしっかり閉じて、鼻から「ンー」と音を出す。",
+        difficulty: "easy",
+        commonMistakes: ["唇が開いている", "鼻音になっていない", "短すぎる"],
+        tips: ["唇をしっかり閉じる", "鼻から音を出す", "十分な長さで"],
+        technicalNotes: "鼻音。日本語とほぼ同じだが、語尾では長めに保つ。",
+        confusedWith: "/n/ (歯茎鼻音), /ŋ/ (軟口蓋鼻音)",
+        minimalPairs: "man /mæn/ vs nan /næn/, time /taɪm/ vs dime /daɪm/",
+        phoneticContext: "語頭、語中、語尾すべてに現れる。",
+        frequency: "英語で高頻度"
+      },
+      {
+        symbol: "n",
+        name: "N",
+        description: "歯茎鼻音",
+        category: "鼻音",
+        examples: ["no", "run", "window", "fine", "pen", "soon"],
+        japaneseGuide: "日本語の「ナ」行に近い音。舌先を歯茎に付けて鼻から音を出す。",
+        bodyInstructions: "舌先を歯茎に付けて、鼻から「ンー」と音を出す。",
+        difficulty: "easy",
+        commonMistakes: ["舌の位置が違う", "/m/と混同する", "口音になってしまう"],
+        tips: ["舌先を歯茎に", "鼻から音を出す", "/m/との区別"],
+        technicalNotes: "歯茎鼻音。/m/より舌先が上にある。",
+        confusedWith: "/m/ (両唇鼻音), /ŋ/ (軟口蓋鼻音)",
+        minimalPairs: "no /noʊ/ vs go /ɡoʊ/, pen /pen/ vs peg /peɡ/",
+        phoneticContext: "語頭、語中、語尾すべてに現れる。",
+        frequency: "英語で非常に高頻度"
+      },
+      {
+        symbol: "ŋ",
+        name: "NG",
+        description: "軟口蓋鼻音",
+        category: "鼻音",
+        examples: ["sing", "long", "think", "finger", "English", "running"],
+        japaneseGuide: "日本語にない音。舌の奥を軟口蓋に付けて鼻から「ング」の音。",
+        bodyInstructions: "舌の奥を軟口蓋（のどちんこの手前）に付けて、鼻から「ング」と音を出す。",
+        difficulty: "medium",
+        commonMistakes: ["/n/+/ɡ/と発音してしまう", "舌の位置が前すぎる", "「ング」と2音で発音"],
+        tips: ["舌の奥を使う", "1つの音として", "鼻から「ング」"],
+        technicalNotes: "軟口蓋鼻音。日本語にない音。語尾や-ing語尾で重要。",
+        confusedWith: "/n/+/ɡ/ (2つの音), /n/ (歯茎鼻音)",
+        minimalPairs: "sing /sɪŋ/ vs sin /sɪn/, running /ˈrʌnɪŋ/ vs run in /rʌn ɪn/",
+        phoneticContext: "語中、語尾に現れる。-ing語尾で重要。",
+        frequency: "英語で高頻度"
+      },
+      {
+        symbol: "l",
+        name: "L",
+        description: "歯茎側面音",
+        category: "側面音",
+        examples: ["love", "hello", "play", "world", "table", "feel"],
+        japaneseGuide: "舌先を歯茎に付けて、舌の両側から息を出す。日本語の「ラ」行とは違う。",
+        bodyInstructions: "舌先を歯茎にしっかり付けて、舌の両側から息を流す。舌先は動かさない。",
+        difficulty: "hard",
+        commonMistakes: ["日本語の「ラ」行で代用", "舌先を動かしてしまう", "/r/と混同する"],
+        tips: ["舌先を歯茎に固定", "舌の両側から息", "弾かない"],
+        technicalNotes: "側面音。/r/との区別が重要。語尾では暗いlになることがある。",
+        confusedWith: "/r/ (歯茎接近音), 日本語の「ラ」行",
+        minimalPairs: "light /laɪt/ vs right /raɪt/, play /pleɪ/ vs pray /preɪ/",
+        phoneticContext: "語頭、語中、語尾すべてに現れる。子音クラスターでも重要。",
+        frequency: "英語で非常に高頻度"
+      },
+      {
+        symbol: "r",
+        name: "American R",
+        description: "アメリカ英語のR音",
+        category: "接近音",
+        examples: ["red", "car", "very", "correct", "three", "great"],
+        japaneseGuide: "舌を丸めて「ワ行」の口の形。舌先は何にも触れない。舌を奥に引く感じ。",
+        bodyInstructions: "唇を軽くすぼめて前に突き出し、舌先を口内のどこにも触れない位置で軽く後方に丸める。",
+        difficulty: "hard",
+        commonMistakes: ["日本語の「ラ行」で代用", "舌先を上顎に付けてしまう", "巻き舌にしすぎる"],
+        tips: ["舌先は何にも触れない", "舌全体を丸める", "唇も少し丸める"],
+        technicalNotes: "日本語の「ラ行」は弾音だが、英語の/r/では舌先は浮いたまま。歯茎接近音。",
+        confusedWith: "/l/ (側面音), /w/ (両唇接近音)",
+        minimalPairs: "right /raɪt/ vs light /laɪt/, red /red/ vs led /led/",
+        phoneticContext: "語頭、語中、語尾すべてに現れる。子音クラスターでも頻出。",
+        frequency: "英語で非常に高頻度"
+      },
+      {
+        symbol: "w",
+        name: "W",
+        description: "両唇軟口蓋接近音",
+        category: "接近音",
+        examples: ["water", "want", "way", "always", "sweet", "queen"],
+        japaneseGuide: "日本語の「ワ」行に近い音。唇を丸めて「ウ」から「ア」へ滑らかに移動。",
+        bodyInstructions: "唇を丸めて前に出し、舌を後ろで高く保つ。「ウ」の口から始めて次の音へ滑らかに移行。",
+        difficulty: "easy",
+        commonMistakes: ["/r/と混同する", "唇を十分に丸めない", "日本語の「ワ」と同じにする"],
+        tips: ["唇をしっかり丸める", "「ウ」から始める", "滑らかに移行"],
+        technicalNotes: "両唇と軟口蓋の同時調音。半母音とも呼ばれる。",
+        confusedWith: "/r/ (歯茎接近音), /v/ (有声唇歯摩擦音)",
+        minimalPairs: "we /wiː/ vsree (none), want /wɑːnt/ vs rant /rænt/",
+        phoneticContext: "語頭や音節の始まりに現れる。",
+        frequency: "英語で高頻度"
+      },
+      {
+        symbol: "j",
+        name: "Y",
+        description: "硬口蓋接近音",
+        category: "接近音",
+        examples: ["yes", "you", "year", "beauty", "few", "music"],
+        japaneseGuide: "日本語の「ヤ」行に近い音。舌を前で高く保ち、次の音へ素早く移動。",
+        bodyInstructions: "舌の前部を硬口蓋に近づけて、次の音へ素早く移行する。",
+        difficulty: "easy",
+        commonMistakes: ["長く伸ばしてしまう", "舌の位置が低い", "摩擦音にしてしまう"],
+        tips: ["舌を前で高く", "素早く移行", "摩擦させない"],
+        technicalNotes: "硬口蓋接近音。半母音。/iː/に似た舌の位置。",
+        confusedWith: "/iː/ (長いイー), /dʒ/ (ジャ音)",
+        minimalPairs: "yes /jes/ vs less /les/, year /jɪr/ vs ear /ɪr/",
+        phoneticContext: "語頭や音節の始まりに現れる。",
+        frequency: "英語で中程度の頻度"
+      },
+      {
+        symbol: "tʃ",
+        name: "CH",
+        description: "無声後部歯茎破擦音",
+        category: "破擦音",
+        examples: ["chair", "teach", "much", "children", "watch", "kitchen"],
+        japaneseGuide: "日本語の「チャ」行に近い音。「ト」+「シュ」を同時に発音する感じ。",
+        bodyInstructions: "舌先を歯茎に付けてから、/ʃ/の位置へ素早く移動させる。",
+        difficulty: "medium",
+        commonMistakes: ["/ʃ/と混同する", "2つの音に分けてしまう", "/t/+/ʃ/として発音"],
+        tips: ["1つの音として", "破裂から摩擦へ", "舌の素早い移動"],
+        technicalNotes: "破擦音。/t/と/ʃ/の組み合わせだが、1つの音素。",
+        confusedWith: "/ʃ/ (シュ音), /t/+/ʃ/ (2つの音)",
+        minimalPairs: "chair /tʃer/ vs share /ʃer/, much /mʌtʃ/ vs mush /mʌʃ/",
+        phoneticContext: "語頭、語中、語尾すべてに現れる。",
+        frequency: "英語で中程度の頻度"
+      },
+      {
+        symbol: "dʒ",
+        name: "J",
+        description: "有声後部歯茎破擦音",
+        category: "破擦音",
+        examples: ["job", "page", "bridge", "magic", "judge", "large"],
+        japaneseGuide: "日本語の「ジャ」行に近い音。「ド」+「ジュ」を同時に発音する感じ。",
+        bodyInstructions: "舌先を歯茎に付けて声帯を震わせ、/ʒ/の位置へ素早く移動。",
+        difficulty: "medium",
+        commonMistakes: ["/ʒ/と混同する", "声が出ていない", "2つの音に分けてしまう"],
+        tips: ["声帯を震わせる", "1つの音として", "破裂から摩擦へ"],
+        technicalNotes: "有声破擦音。/d/と/ʒ/の組み合わせだが、1つの音素。",
+        confusedWith: "/ʒ/ (ジュ音), /d/+/ʒ/ (2つの音)",
+        minimalPairs: "job /dʒɑːb/ vs shop /ʃɑːp/, page /peɪdʒ/ vs pace /peɪs/",
+        phoneticContext: "語頭、語中、語尾すべてに現れる。",
+        frequency: "英語で中程度の頻度"
+      }
+    ],
+    diphthongs: [
+      {
+        symbol: "eɪ",
+        name: "Long A",
+        description: "「エイ」二重母音",
+        category: "二重母音",
+        examples: ["eight", "safe", "pay", "take", "make", "day"],
+        japaneseGuide: "「エ」から「イ」へ滑らかに移動。後半の「イ」は軽く添える。日本語の「エイ」より滑らか。",
+        bodyInstructions: "「エ」の口から始まって「イ」の口で終わる。口の形をあまり変えすぎずに舌を前方・上方に移動。",
+        difficulty: "medium",
+        commonMistakes: ["「エー」で終わらせてしまう", "二つの音に分けすぎる", "日本語の「エイ」と同じにする"],
+        tips: ["滑らかに移動", "最初は「エ」、最後は「イ」", "一続きの音として発音"],
+        technicalNotes: "日本語の「エイ」はしばしば長母音化するが、英語ではしっかり舌が動く。",
+        confusedWith: "/e/ (短いエ), /iː/ (長いイー), /aɪ/ (アイ二重母音)",
+        minimalPairs: "say /seɪ/ vs see /siː/, pain /peɪn/ vs pen /pen/",
+        phoneticContext: "語尾や開音節でよく現れる。英語の基本的な二重母音。",
+        frequency: "英語で高頻度の二重母音"
+      },
+      {
+        symbol: "aɪ",
+        name: "Long I",
+        description: "「アイ」二重母音",
+        category: "二重母音",
+        examples: ["I", "fly", "pie", "time", "my", "like"],
+        japaneseGuide: "しっかり「ア」から「イ」へ。最初の「ア」は日本語より奥まった音。一息で発音する。",
+        bodyInstructions: "大きく口を開けて「ア」から始まり、「イ」で終わる。口を丸めて大きく開けてから「イ」へ移行。",
+        difficulty: "medium",
+        commonMistakes: ["「アー」で終わらせてしまう", "最初の「ア」が不十分", "2つの音に分けすぎる"],
+        tips: ["最初はしっかり口を開けて「ア」", "滑らかに「イ」へ移動", "一息で発音"],
+        technicalNotes: "日本語の「アイ」より滑らか。低舌音から高舌音への移行が特徴。",
+        confusedWith: "/ɑː/ (長いア), /eɪ/ (エイ二重母音), /ɔɪ/ (オイ二重母音)",
+        minimalPairs: "I /aɪ/ vs eye /aɪ/, time /taɪm/ vs team /tiːm/",
+        phoneticContext: "語尾や開音節でよく現れる。「I」や「my」など基本語で重要。",
+        frequency: "英語で非常に高頻度の二重母音"
+      },
+      {
+        symbol: "ɔɪ",
+        name: "OI/OY",
+        description: "「オイ」二重母音",
+        category: "二重母音",
+        examples: ["boy", "oil", "choice", "voice", "toy", "enjoy"],
+        japaneseGuide: "「オ」から「イ」へ滑らかに移動。日本語の「オイ」に近いが、最初の「オ」はより丸い音。",
+        bodyInstructions: "唇を丸めて「オ」から始まり、「イ」で終わる。唇の形を変えながら舌も移動。",
+        difficulty: "medium",
+        commonMistakes: ["日本語の「オイ」と同じにする", "最初の「オ」が不十分", "2つの音に分けすぎる"],
+        tips: ["最初は唇を丸める", "滑らかに「イ」へ", "一息で発音"],
+        technicalNotes: "後舌円唇音から前舌非円唇音への移行。",
+        confusedWith: "/oʊ/ (オウ二重母音), /aɪ/ (アイ二重母音)",
+        minimalPairs: "boy /bɔɪ/ vs bow /boʊ/, oil /ɔɪl/ vs all /ɔːl/",
+        phoneticContext: "語中、語尾に現れる。特定の綴りパターンで現れる。",
+        frequency: "英語で中程度の頻度"
+      },
+      {
+        symbol: "aʊ",
+        name: "OW/OU",
+        description: "「アウ」二重母音",
+        category: "二重母音",
+        examples: ["how", "house", "down", "about", "town", "found"],
+        japaneseGuide: "「ア」から「ウ」へ滑らかに移動。最初の「ア」ははっきりと、「ウ」は軽く。",
+        bodyInstructions: "口を大きく開けて「ア」から始まり、唇を丸めて「ウ」で終わる。",
+        difficulty: "medium",
+        commonMistakes: ["日本語の「アウ」と同じにする", "最後の「ウ」が強すぎる", "2つの音に分けすぎる"],
+        tips: ["最初はしっかり「ア」", "軽く「ウ」で終わる", "滑らかに移行"],
+        technicalNotes: "低舌音から高舌円唇音への移行。",
+        confusedWith: "/ɑː/ (長いア), /oʊ/ (オウ二重母音)",
+        minimalPairs: "how /haʊ/ vs who /huː/, house /haʊs/ vs hose /hoʊz/",
+        phoneticContext: "語中、語尾に現れる。",
+        frequency: "英語で高頻度の二重母音"
+      },
+      {
+        symbol: "oʊ",
+        name: "Long O",
+        description: "「オウ」二重母音",
+        category: "二重母音",
+        examples: ["go", "home", "boat", "know", "show", "old"],
+        japaneseGuide: "「オ」から「ウ」へ滑らかに移動。日本語の「オー」とは違い、必ず「ウ」で終わる。",
+        bodyInstructions: "唇を軽く丸めて「オ」から始まり、より丸めて「ウ」で終わる。",
+        difficulty: "medium",
+        commonMistakes: ["日本語の「オー」と同じにする", "「ウ」で終わらない", "長母音にしてしまう"],
+        tips: ["必ず「ウ」で終わる", "唇の動きを意識", "二重母音として発音"],
+        technicalNotes: "アメリカ英語では/oʊ/、イギリス英語では/əʊ/。",
+        confusedWith: "/ɔː/ (長いオー), /aʊ/ (アウ二重母音)",
+        minimalPairs: "go /ɡoʊ/ vs good /ɡʊd/, boat /boʊt/ vs boot /buːt/",
+        phoneticContext: "語尾や開音節でよく現れる。",
+        frequency: "英語で高頻度の二重母音"
+      },
+      {
+        symbol: "ɪə",
+        name: "EAR",
+        description: "「イア」二重母音",
+        category: "二重母音",
+        examples: ["here", "near", "clear", "beer", "year", "idea"],
+        japaneseGuide: "「イ」から「ア」へ滑らかに移動。後半は軽いシュワ音。",
+        bodyInstructions: "「イ」の口から始まって、あいまいな「ア」で終わる。",
+        difficulty: "medium",
+        commonMistakes: ["2つの音に分けすぎる", "最後を「ア」で終わらせる", "長く伸ばしすぎる"],
+        tips: ["滑らかに移行", "最後は軽いシュワ", "一息で発音"],
+        technicalNotes: "イギリス英語で顕著。アメリカ英語では/ɪr/になることが多い。",
+        confusedWith: "/ɪr/ (アメリカ英語), /iː/ (長いイー)",
+        minimalPairs: "here /hɪə/ vs hear /hɪr/, near /nɪə/ vs knee /niː/",
+        phoneticContext: "主にr音の前の環境で現れる。",
+        frequency: "イギリス英語で中程度の頻度"
+      },
+      {
+        symbol: "eə",
+        name: "AIR",
+        description: "「エア」二重母音",
+        category: "二重母音",
+        examples: ["care", "hair", "there", "where", "fair", "chair"],
+        japaneseGuide: "「エ」から「ア」へ滑らかに移動。後半は軽いシュワ音。",
+        bodyInstructions: "「エ」の口から始まって、あいまいな「ア」で終わる。",
+        difficulty: "medium",
+        commonMistakes: ["2つの音に分けすぎる", "最後を「ア」で終わらせる", "/e/と混同する"],
+        tips: ["滑らかに移行", "最後は軽いシュワ", "一息で発音"],
+        technicalNotes: "イギリス英語で顕著。アメリカ英語では/er/になることが多い。",
+        confusedWith: "/er/ (アメリカ英語), /e/ (短いエ)",
+        minimalPairs: "care /keə/ vs car /kɑː/, hair /heə/ vs her /hɜː/",
+        phoneticContext: "主にr音の前の環境で現れる。",
+        frequency: "イギリス英語で中程度の頻度"
+      },
+      {
+        symbol: "ʊə",
+        name: "URE",
+        description: "「ウア」二重母音",
+        category: "二重母音",
+        examples: ["pure", "sure", "tour", "poor", "cure", "endure"],
+        japaneseGuide: "「ウ」から「ア」へ滑らかに移動。後半は軽いシュワ音。現代では/ɔː/になることも。",
+        bodyInstructions: "唇を丸めて「ウ」から始まって、あいまいな「ア」で終わる。",
+        difficulty: "hard",
+        commonMistakes: ["/ɔː/と混同する", "2つの音に分けすぎる", "古い発音で覚えている"],
+        tips: ["現代では/ɔː/が多い", "地域により異なる", "文脈で判断"],
+        technicalNotes: "現代英語では消失傾向。多くの話者が/ɔː/で発音。",
+        confusedWith: "/ɔː/ (長いオー), /ʊr/ (アメリカ英語)",
+        minimalPairs: "poor /pʊə/ vs paw /pɔː/, sure /ʃʊə/ vs shore /ʃɔː/",
+        phoneticContext: "特定の単語でのみ現れる。消失傾向。",
+        frequency: "現代英語で低頻度"
+      }
+    ]
+  };
+
+  const allSymbols = [
+    ...pronunciationData.vowels,
+    ...pronunciationData.consonants,
+    ...pronunciationData.diphthongs
+  ];
+
+  const getCurrentData = () => {
+    switch(selectedCategory) {
+      case 'vowels': return pronunciationData.vowels;
+      case 'short-vowels': return pronunciationData.vowels.filter(v => v.category === '短母音');
+      case 'long-vowels': return pronunciationData.vowels.filter(v => v.category === '長母音');
+      case 'consonants': return pronunciationData.consonants;
+      case 'diphthongs': return pronunciationData.diphthongs;
+      case 'all': return allSymbols;
+      default: return pronunciationData.vowels;
+    }
+  };
+
+  const currentData = getCurrentData();
+  const currentSymbol = currentData[currentSymbolIndex];
+
+  const shouldShowDetails = () => {
+    switch(detailsMode) {
+      case 'always-open': return true;
+      case 'always-closed': return false;
+      case 'manual': return showDetails;
+      default: return showDetails;
+    }
+  };
+
+  const speakExample = (text) => {
+    if ('speechSynthesis' in window) {
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'en-US';
+      utterance.rate = 0.6;
+      speechSynthesis.speak(utterance);
+    }
+  };
+
+  const nextSymbol = () => {
+    setCurrentSymbolIndex((prev) => (prev + 1) % currentData.length);
+    if (detailsMode === 'manual') {
+      setShowDetails(false);
+    }
+    setShowMouthDiagram(false);
+  };
+
+  const prevSymbol = () => {
+    setCurrentSymbolIndex((prev) => (prev - 1 + currentData.length) % currentData.length);
+    if (detailsMode === 'manual') {
+      setShowDetails(false);
+    }
+    setShowMouthDiagram(false);
+  };
+
+  const shuffleSymbol = () => {
+    const randomIndex = Math.floor(Math.random() * currentData.length);
+    setCurrentSymbolIndex(randomIndex);
+    if (detailsMode === 'manual') {
+      setShowDetails(false);
+    }
+    setShowMouthDiagram(false);
+  };
+
+  const getDifficultyColor = (difficulty) => {
+    switch(difficulty) {
+      case 'easy': return 'text-green-500';
+      case 'medium': return 'text-orange-500';
+      case 'hard': return 'text-red-500';
+      default: return 'text-gray-500';
+    }
+  };
+
+  const getDifficultyBadge = (difficulty) => {
+    switch(difficulty) {
+      case 'easy': return 'bg-green-100 text-green-700 border-green-200';
+      case 'medium': return 'bg-orange-100 text-orange-700 border-orange-200';
+      case 'hard': return 'bg-red-100 text-red-700 border-red-200';
+      default: return 'bg-gray-100 text-gray-700 border-gray-200';
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+      <div className="max-w-5xl mx-auto px-4 py-8">
+        {/* Header */}
+        <div className="text-center mb-8">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl mb-4 shadow-lg">
+            <span className="text-2xl text-white font-bold">IPA</span>
+          </div>
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent mb-2">
+            発音記号マスター
+          </h1>
+          <p className="text-lg text-gray-600 font-medium">美しい発音を身につけよう</p>
+        </div>
+
+        {/* Settings Card */}
+        <div className="bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl border border-white/20 p-6 mb-8">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+              <span className="text-sm font-semibold text-gray-700">詳細表示設定</span>
+            </div>
+            <select
+              value={detailsMode}
+              onChange={(e) => setDetailsMode(e.target.value)}
+              className="px-4 py-2 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white/70 backdrop-blur-sm"
+            >
+              <option value="manual">手動切り替え</option>
+              <option value="always-open">常に表示</option>
+              <option value="always-closed">常に非表示</option>
+            </select>
+          </div>
+        </div>
+
+        {/* Category Pills */}
+        <div className="flex justify-center gap-3 mb-8 flex-wrap">
+          {[
+            { key: 'vowels', label: '母音', count: pronunciationData.vowels.length, emoji: '🔤' },
+            { key: 'short-vowels', label: '短母音', count: pronunciationData.vowels.filter(v => v.category === '短母音').length, emoji: '⚡' },
+            { key: 'long-vowels', label: '長母音', count: pronunciationData.vowels.filter(v => v.category === '長母音').length, emoji: '➡️' },
+            { key: 'diphthongs', label: '二重母音', count: pronunciationData.diphthongs.length, emoji: '🌊' },
+            { key: 'consonants', label: '子音', count: pronunciationData.consonants.length, emoji: '🎯' },
+            { key: 'all', label: '全て', count: allSymbols.length, emoji: '📚' }
+          ].map(({ key, label, count, emoji }) => (
+            <button
+              key={key}
+              onClick={() => {
+                setSelectedCategory(key);
+                setCurrentSymbolIndex(0);
+                if (detailsMode === 'manual') {
+                  setShowDetails(false);
+                }
+                setShowMouthDiagram(false);
+              }}
+              className={`px-5 py-3 rounded-2xl text-sm font-semibold transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 ${
+                selectedCategory === key 
+                  ? 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-blue-200' 
+                  : 'bg-white/80 backdrop-blur-sm text-gray-700 hover:bg-white border border-white/20'
+              }`}
+            >
+              <span className="mr-2">{emoji}</span>
+              {label} ({count})
+            </button>
+          ))}
+        </div>
+
+        {/* Main Card */}
+        <div className="bg-white/90 backdrop-blur-lg rounded-3xl shadow-2xl border border-white/20 overflow-hidden">
+          {/* Symbol Display */}
+          <div className="relative bg-gradient-to-br from-blue-50 to-indigo-50 p-12 text-center">
+            <div className="absolute top-6 right-6">
+              <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold border ${getDifficultyBadge(currentSymbol.difficulty)}`}>
+                {currentSymbol.difficulty === 'easy' && '🟢'}
+                {currentSymbol.difficulty === 'medium' && '🟡'}
+                {currentSymbol.difficulty === 'hard' && '🔴'}
+                <span className="ml-1">
+                  {currentSymbol.difficulty === 'easy' && '簡単'}
+                  {currentSymbol.difficulty === 'medium' && '普通'}
+                  {currentSymbol.difficulty === 'hard' && '難しい'}
+                </span>
+              </span>
+            </div>
+            
+            <div className="mb-6">
+              <div className="text-8xl font-mono text-transparent bg-gradient-to-br from-blue-600 to-indigo-700 bg-clip-text mb-4 tracking-wider">
+                /{currentSymbol.symbol}/
+              </div>
+              <h2 className="text-3xl font-bold text-gray-800 mb-2">
+                {currentSymbol.name}
+              </h2>
+              <p className="text-lg text-gray-600 mb-4">{currentSymbol.description}</p>
+              <div className="flex justify-center gap-4 text-sm text-gray-500">
+                <span>📊 {currentSymbol.category}</span>
+                <span>🔄 {currentSymbol.frequency}</span>
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex justify-center gap-4 mb-6">
+              <button
+                onClick={() => speakExample(currentSymbol.examples[0])}
+                className="flex items-center gap-2 bg-white/80 backdrop-blur-sm hover:bg-white text-blue-600 px-6 py-3 rounded-2xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 border border-white/20"
+              >
+                <Play className="w-5 h-5" />
+                <span className="font-medium">音声再生</span>
+              </button>
+              <button
+                onClick={() => setShowMouthDiagram(!showMouthDiagram)}
+                className="flex items-center gap-2 bg-white/80 backdrop-blur-sm hover:bg-white text-green-600 px-6 py-3 rounded-2xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 border border-white/20"
+              >
+                <Eye className="w-5 h-5" />
+                <span className="font-medium">詳細情報</span>
+              </button>
+            </div>
+          </div>
+
+          {/* Content Area */}
+          <div className="p-8">
+            {/* Mouth Diagram */}
+            {showMouthDiagram && (
+              <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl p-6 mb-6 border border-green-100">
+                <h3 className="text-lg font-bold text-green-800 mb-4 flex items-center gap-2">
+                  <span>📊</span>
+                  調音情報
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                  <div className="bg-white/50 rounded-xl p-4">
+                    <strong className="text-green-700">音声的文脈:</strong>
+                    <p className="text-green-600 mt-1">{currentSymbol.phoneticContext}</p>
+                  </div>
+                  <div className="bg-white/50 rounded-xl p-4">
+                    <strong className="text-green-700">混同しやすい音:</strong>
+                    <p className="text-green-600 mt-1">{currentSymbol.confusedWith}</p>
+                  </div>
+                  <div className="md:col-span-2 bg-white/50 rounded-xl p-4">
+                    <strong className="text-green-700">最小対立語:</strong>
+                    <p className="text-green-600 mt-1">{currentSymbol.minimalPairs}</p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Examples */}
+            <div className="mb-8">
+              <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-2">
+                <span>📝</span>
+                例文
+              </h3>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                {currentSymbol.examples.map((example, index) => (
+                  <button
+                    key={index}
+                    onClick={() => speakExample(example)}
+                    className="group text-left p-4 bg-gray-50 hover:bg-gray-100 rounded-2xl transition-all duration-200 flex items-center gap-3 border border-gray-100 hover:border-gray-200 hover:shadow-md"
+                  >
+                    <div className="flex-shrink-0 w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center group-hover:bg-blue-200 transition-colors">
+                      <Volume2 className="w-4 h-4 text-blue-600" />
+                    </div>
+                    <span className="font-medium text-gray-700">{example}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Details Toggle */}
+            {detailsMode === 'manual' && (
+              <div className="text-center mb-8">
+                <button
+                  onClick={() => setShowDetails(!showDetails)}
+                  className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 font-semibold px-6 py-3 rounded-2xl hover:bg-blue-50 transition-all duration-200"
+                >
+                  <Info className="w-5 h-5" />
+                  {showDetails ? '詳細を隠す' : '詳細情報を表示'}
+                </button>
+              </div>
+            )}
+
+            {/* Detailed Information */}
+            {shouldShowDetails() && (
+              <div className="space-y-6">
+                <div className="bg-gradient-to-r from-blue-50 to-cyan-50 rounded-2xl p-6 border border-blue-100">
+                  <h4 className="text-blue-800 font-bold mb-3 flex items-center gap-2 text-lg">
+                    <span>🇯🇵</span>
+                    日本語ガイド
+                  </h4>
+                  <p className="text-blue-700 leading-relaxed">{currentSymbol.japaneseGuide}</p>
+                </div>
+
+                <div className="bg-gradient-to-r from-green-50 to-emerald-50 rounded-2xl p-6 border border-green-100">
+                  <h4 className="text-green-800 font-bold mb-3 flex items-center gap-2 text-lg">
+                    <span>🎯</span>
+                    発音のコツ
+                  </h4>
+                  <p className="text-green-700 leading-relaxed">{currentSymbol.bodyInstructions}</p>
+                </div>
+
+                <div className="bg-gradient-to-r from-red-50 to-pink-50 rounded-2xl p-6 border border-red-100">
+                  <h4 className="text-red-800 font-bold mb-3 flex items-center gap-2 text-lg">
+                    <span>❌</span>
+                    よくある間違い
+                  </h4>
+                  <ul className="text-red-700 space-y-2">
+                    {currentSymbol.commonMistakes.map((mistake, index) => (
+                      <li key={index} className="flex items-start gap-3">
+                        <span className="flex-shrink-0 w-5 h-5 bg-red-100 rounded-full flex items-center justify-center mt-0.5">
+                          <span className="text-xs">•</span>
+                        </span>
+                        <span className="leading-relaxed">{mistake}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                <div className="bg-gradient-to-r from-yellow-50 to-orange-50 rounded-2xl p-6 border border-yellow-100">
+                  <h4 className="text-yellow-800 font-bold mb-3 flex items-center gap-2 text-lg">
+                    <span>💡</span>
+                    練習のコツ
+                  </h4>
+                  <ul className="text-yellow-700 space-y-2">
+                    {currentSymbol.tips.map((tip, index) => (
+                      <li key={index} className="flex items-start gap-3">
+                        <span className="flex-shrink-0 w-5 h-5 bg-yellow-100 rounded-full flex items-center justify-center mt-0.5">
+                          <span className="text-xs">✓</span>
+                        </span>
+                        <span className="leading-relaxed">{tip}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                <div className="bg-gradient-to-r from-gray-50 to-slate-50 rounded-2xl p-6 border border-gray-100">
+                  <h4 className="text-gray-800 font-bold mb-3 flex items-center gap-2 text-lg">
+                    <span>🔬</span>
+                    技術的ノート
+                  </h4>
+                  <p className="text-gray-700 leading-relaxed">{currentSymbol.technicalNotes}</p>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Navigation */}
+        <div className="flex justify-between items-center mt-8">
+          <button
+            onClick={prevSymbol}
+            className="flex items-center gap-3 bg-white/80 backdrop-blur-sm hover:bg-white text-gray-700 px-8 py-4 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5 border border-white/20"
+          >
+            <ChevronLeft className="w-5 h-5" />
+            <span className="font-semibold">前へ</span>
+          </button>
+          
+          <div className="flex items-center gap-4">
+            <div className="text-center">
+              <div className="text-sm text-gray-500 mb-1">進捗</div>
+              <div className="text-lg font-bold text-gray-700">
+                {currentSymbolIndex + 1} / {currentData.length}
+              </div>
+            </div>
+            <button
+              onClick={shuffleSymbol}
+              className="bg-white/80 backdrop-blur-sm hover:bg-white text-green-600 p-4 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5 border border-white/20"
+            >
+              <Shuffle className="w-5 h-5" />
+            </button>
+          </div>
+          
+          <button
+            onClick={nextSymbol}
+            className="flex items-center gap-3 bg-white/80 backdrop-blur-sm hover:bg-white text-gray-700 px-8 py-4 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-200 transform hover:-translate-y-0.5 border border-white/20"
+          >
+            <span className="font-semibold">次へ</span>
+            <ChevronRight className="w-5 h-5" />
+          </button>
+        </div>
+
+        {/* Progress Dots */}
+        <div className="flex justify-center gap-2 mt-8 flex-wrap max-w-2xl mx-auto">
+          {currentData.map((_, index) => (
+            <button
+              key={index}
+              onClick={() => {
+                setCurrentSymbolIndex(index);
+                if (detailsMode === 'manual') {
+                  setShowDetails(false);
+                }
+                setShowMouthDiagram(false);
+              }}
+              className={`w-3 h-3 rounded-full transition-all duration-200 transform hover:scale-125 ${
+                index === currentSymbolIndex 
+                  ? 'bg-gradient-to-r from-blue-500 to-indigo-600 shadow-lg' 
+                  : 'bg-gray-300 hover:bg-gray-400'
+              }`}
+            />
+          ))}
+        </div>
+
+        {/* Footer */}
+        <div className="text-center mt-12 py-8">
+          <p className="text-gray-500 text-sm">
+            美しい発音で、自信を持って英語を話そう ✨
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default PronunciationApp;
